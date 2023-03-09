@@ -1,0 +1,33 @@
+version: '2.3'
+
+networks:
+  traefik:
+    external: true
+
+services:
+  release:
+    build:
+      network: host
+      context: .
+    image: "nounique/${COMPOSE_IMAGE_NAME}:${IMAGE_TAG:-latest}"
+    volumes:
+      - ./CodeFormer/weights:/app/CodeFormer/weights:rw
+    command:
+      - /bin/bash
+      - -c
+      - |
+        python CodeFormer/web-demos/hugging_face/app.py
+    networks:
+      - traefik
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik
+      - traefik.http.routers.${COMPOSE_IMAGE_NAME}.rule=PathPrefix(`/${COMPOSE_IMAGE_NAME}`)
+      - traefik.http.routers.${COMPOSE_IMAGE_NAME}.service=${COMPOSE_IMAGE_NAME}
+      - traefik.http.services.${COMPOSE_IMAGE_NAME}.loadbalancer.serverstransport=docker-transport@file
+      - traefik.http.routers.${COMPOSE_IMAGE_NAME}.middlewares=basicauth@file,${COMPOSE_IMAGE_NAME}-redirect,${COMPOSE_IMAGE_NAME}-strip
+      - traefik.http.middlewares.${COMPOSE_IMAGE_NAME}-strip.stripprefix.prefixes=/${COMPOSE_IMAGE_NAME}
+      - traefik.http.middlewares.${COMPOSE_IMAGE_NAME}-redirect.redirectregex.regex=^(?:.*:\/\/)?([^:\/]*?\.[^\/]*)[^\/\?]*\/${COMPOSE_IMAGE_NAME}$$
+      - traefik.http.middlewares.${COMPOSE_IMAGE_NAME}-redirect.redirectregex.replacement=https://$${1}/${COMPOSE_IMAGE_NAME}/
+      - traefik.http.middlewares.${COMPOSE_IMAGE_NAME}-redirect.redirectregex.permanent=true
+    shm_size: 2gb

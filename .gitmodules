@@ -1,0 +1,6 @@
+[submodule ".devcontainer"]
+	path = .devcontainer
+	url = git@github.com:NoUnique/.devcontainer.git
+[submodule "CodeFormer"]
+	path = CodeFormer
+	url = git@github.com:sczhou/CodeFormer.git
