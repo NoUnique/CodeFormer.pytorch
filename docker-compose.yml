@@ -24,8 +24,8 @@ services:
       - traefik.docker.network=traefik
       - traefik.http.routers.${COMPOSE_IMAGE_NAME}.rule=PathPrefix(`/${COMPOSE_IMAGE_NAME}`)
       - traefik.http.routers.${COMPOSE_IMAGE_NAME}.service=${COMPOSE_IMAGE_NAME}
-      - traefik.http.services.${COMPOSE_IMAGE_NAME}.loadbalancer.serverstransport=docker-transport@file
-      - traefik.http.routers.${COMPOSE_IMAGE_NAME}.middlewares=basicauth@file,${COMPOSE_IMAGE_NAME}-redirect,${COMPOSE_IMAGE_NAME}-strip
+      - traefik.http.services.${COMPOSE_IMAGE_NAME}.loadbalancer.serversTransport=docker-transport@file
+      - traefik.http.routers.${COMPOSE_IMAGE_NAME}.middlewares=traefik-forward-auth,${COMPOSE_IMAGE_NAME}-redirect,${COMPOSE_IMAGE_NAME}-strip
       - traefik.http.middlewares.${COMPOSE_IMAGE_NAME}-strip.stripprefix.prefixes=/${COMPOSE_IMAGE_NAME}
       - traefik.http.middlewares.${COMPOSE_IMAGE_NAME}-redirect.redirectregex.regex=^(?:.*:\/\/)?([^:\/]*?\.[^\/]*)[^\/\?]*\/${COMPOSE_IMAGE_NAME}$$
       - traefik.http.middlewares.${COMPOSE_IMAGE_NAME}-redirect.redirectregex.replacement=https://$${1}/${COMPOSE_IMAGE_NAME}/
